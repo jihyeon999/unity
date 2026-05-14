@@ -6,18 +6,20 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 5f;        // 이동 속도
     public float mouseSensitivity = 2f; // 마우스 감도
 
-    [Header("카메라")]
-    public Camera playerCamera;         // 플레이어 카메라 (First Person)
+    [Header("중력 설정")]
+    public float gravity = -9.81f;      // 중력
+    public float groundedGravity = -2f; // 땅에 붙어있게 하는 작은 중력값
 
-    private Rigidbody rb;
+    [Header("카메라")]
+    public Camera playerCamera;         // 플레이어 카메라
+
+    private CharacterController controller;
     private float xRotation = 0f;       // 카메라 상하 회전값
+    private Vector3 velocity;           // 중력 속도 저장용
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-
-        // 리지드바디 설정 - 플레이어가 넘어지지 않도록
-        rb.freezeRotation = true;
+        controller = GetComponent<CharacterController>();
 
         // 마우스 커서 잠금
         Cursor.lockState = CursorLockMode.Locked;
@@ -33,33 +35,38 @@ public class PlayerMovement : MonoBehaviour
             Cursor.visible = false;
         }
 
-        // 마우스로 시점 회전
         LookAround();
-    }
-
-    void FixedUpdate()
-    {
-        // WASD 이동 (물리 기반이라 FixedUpdate에서 처리)
         Move();
     }
 
     void Move()
     {
         float horizontal = Input.GetAxisRaw("Horizontal"); // A / D
-        float vertical = Input.GetAxisRaw("Vertical");   // W / S
+        float vertical = Input.GetAxisRaw("Vertical");     // W / S
 
-        // 카메라가 바라보는 방향 기준으로 이동
+        // 플레이어가 바라보는 방향 기준으로 이동
         Vector3 moveDir = transform.right * horizontal + transform.forward * vertical;
 
-        // 정규화 (대각선 이동 시 속도 일정하게)
+        // 대각선 이동 속도 보정
         if (moveDir.magnitude > 1f)
+        {
             moveDir.Normalize();
+        }
 
-        Vector3 targetVelocity = moveDir * moveSpeed;
+        // 수평 이동
+        controller.Move(moveDir * moveSpeed * Time.deltaTime);
 
-        // Y축 속도(중력)는 건드리지 않음
-        targetVelocity.y = rb.linearVelocity.y;
-        rb.linearVelocity = targetVelocity;
+        // 바닥에 닿아 있으면 아래로 살짝 눌러줌
+        if (controller.isGrounded && velocity.y < 0)
+        {
+            velocity.y = groundedGravity;
+        }
+
+        // 중력 적용
+        velocity.y += gravity * Time.deltaTime;
+
+        // 수직 이동
+        controller.Move(velocity * Time.deltaTime);
     }
 
     void LookAround()
@@ -67,12 +74,13 @@ public class PlayerMovement : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        // 플레이어 몸통: 좌우 회전
+        // 플레이어 몸통 좌우 회전
         transform.Rotate(Vector3.up * mouseX);
 
-        // 카메라: 상하 회전 (위아래 각도 제한 -90 ~ 90)
+        // 카메라 상하 회전
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
         playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
     }
 }
