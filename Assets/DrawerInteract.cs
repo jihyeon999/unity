@@ -58,8 +58,11 @@ public class DrawerInteract : MonoBehaviour
             }
             else
             {
-                Debug.Log(requiredKeyName + "이(가) 필요하다.");
-                // 여기에 "열쇠가 필요합니다" 같은 UI 연출을 넣으면 좋습니다.
+                Debug.Log("잠겨있다. 열쇠가 필요할 것 같다.");
+                if (GameMessageUI.Instance != null)
+                {
+                    GameMessageUI.Instance.ShowMessage("잠겨있다. 열쇠가 필요할 것 같다.");
+                }
                 return;
             }
         }
@@ -72,6 +75,15 @@ public class DrawerInteract : MonoBehaviour
     public void Unlock()
     {
         isLocked = false;
+        // 인벤토리 매니저에게 사용한 열쇠를 지우라고 명령합니다.
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.RemoveItem(requiredKeyName);
+        }
         Debug.Log("잠금을 풀었다.");
+        if (GameMessageUI.Instance != null)
+        {
+            GameMessageUI.Instance.ShowMessage("잠금을 풀었다.");
+        }
     }
 }

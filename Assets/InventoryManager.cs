@@ -18,7 +18,7 @@ public class InventoryManager : MonoBehaviour
     void Start()
     {
         // 부모 밑에 있는 모든 InventorySlot을 배열로 가져옵니다.
-        slots = slotParent.GetComponentsInChildren<InventorySlot>();
+        slots = slotParent.GetComponentsInChildren<InventorySlot>(true);
         UpdateUI();
     }
 
@@ -36,6 +36,10 @@ public class InventoryManager : MonoBehaviour
     {
         items.Add(newItem);
         Debug.Log(newItem.itemName + " 획득!");
+        if (GameMessageUI.Instance != null)
+        {
+            GameMessageUI.Instance.ShowMessage(newItem.itemName + "을(를) 획득했다.");
+        }
         UpdateUI(); // 아이템을 먹을 때마다 화면 갱신
     }
 
@@ -51,6 +55,19 @@ public class InventoryManager : MonoBehaviour
             else
             {
                 slots[i].ClearSlot(); // 나머지는 빈 칸 처리
+            }
+        }
+    }
+
+    public void RemoveItem(string targetName)
+    {
+        foreach (InventorySlot slot in slots) // 모든 슬롯을 하나씩 확인
+        {
+            // 슬롯의 이름이 내가 지우려는 아이템 이름과 같다면
+            if (slot.itemName == targetName)
+            {
+                slot.ClearSlot(); // ★ 여기서 비로소 함수가 호출됩니다!
+                return; // 찾아서 지웠으니 종료
             }
         }
     }
