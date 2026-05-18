@@ -4,11 +4,11 @@ public class DrawerInteract : MonoBehaviour
 {
     [Header("서랍 설정")]
     public Transform drawer; //열릴 서랍 오브젝트(cabinet1 or cabinet2)
-    public float openOffset = 0.5f; //서랍이 열릴 x 거리
+    public float openOffset = 0.5f; //서랍이 열릴 x 거리(서랍이 어디까지 열릴지를 정함)
     public float openSpeed = 3f; //열리는 속도
     public bool isLocked = false; //잠김 여부
 
-    // 추가: 이 서랍을 여는 데 필요한 열쇠 이름
+    // 이 서랍을 여는 데 필요한 열쇠 이름
     [Header("잠금 설정")]
     public string requiredKeyName = "서랍 열쇠";
 
@@ -20,21 +20,34 @@ public class DrawerInteract : MonoBehaviour
     private bool isOpen = false;
     private bool isMoving = false;
 
-    public bool IsOpen => isOpen; // => : get { retrun inOpen; } 을 줄인 것
+    public bool IsOpen 
+    {
+        get
+        {
+            return isOpen; //isOpen을 호출하면 isOpen 값을 돌려줌
+        }
+    }
 
     void Start()
     {
-        closedPos = drawer.localPosition;
-        // 현재 X축으로 이동하게 되어 있는데, 
-        // 만약 옆으로 열린다면 new Vector3(0f, 0f, openOffset) 등으로 수정하세요.
-        openPos = closedPos + new Vector3(openOffset, 0f, 0f);
+        closedPos = drawer.localPosition; //시작할 때 서랍의 현재 위치를 닫힌 위치로 저장함
+        openPos = closedPos + new Vector3(openOffset, 0f, 0f); //닫힌 위치에서 X축 방향으로 openOffset만큼 이동한 위치를 열린 위치로 정함
     }
 
     void Update()
     {
         if (isMoving) //서랍 열기/닫기 애니메이션
         {
-            Vector3 target = isOpen ? openPos : closedPos;
+            Vector3 target;
+
+            if (isOpen)
+            {
+                target = openPos;
+            }
+            else
+            {
+                target = closedPos;
+            }
             drawer.localPosition = Vector3.Lerp(drawer.localPosition, target, Time.deltaTime * openSpeed);
 
             if (Vector3.Distance(drawer.localPosition, target) < 0.001f)

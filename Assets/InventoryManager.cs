@@ -4,27 +4,27 @@ using System.Collections.Generic;
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance; // 어디서든 접근 가능하게 싱글톤 설정
-    public List<Item> items = new List<Item>(); // 아이템 저장소
+    public List<Item> items = new List<Item>(); // 플레이어가 획득한 아이템 저장
 
     [Header("UI 설정")]
     public GameObject inventoryUI; // 에디터에서 InventoryPanel을 드래그해서 넣어줄 칸
-    public Transform slotParent;      // 슬롯들이 모여있는 부모 (Grid Layout Group이 붙은 곳)
+    public Transform slotParent;      // 인벤토리 패널 (슬롯들의 부모 오브젝트) = 화면에 보이는 슬롯
     private InventorySlot[] slots;    // 모든 슬롯 리스트
 
-    private bool isInventoryOpen = false;
+    private bool isInventoryOpen = false; //시작 시 인벤토리 창 끄기
 
     void Awake() { Instance = this; }
 
     void Start()
     {
-        // 부모 밑에 있는 모든 InventorySlot을 배열로 가져옵니다.
+        // 부모 밑에 있는 모든 InventorySlot을 배열로 가져옴, 아이템 개수에 맞게 슬롯을 채움
         slots = slotParent.GetComponentsInChildren<InventorySlot>(true);
         UpdateUI();
     }
 
     void Update()
     {
-        // 'I' 키를 누르면 토글(Toggle)
+        // 'I' 키를 누르면 인벤토리 열기
         if (Input.GetKeyDown(KeyCode.I))
         {
             ToggleInventory();
@@ -66,7 +66,7 @@ public class InventoryManager : MonoBehaviour
             // 슬롯의 이름이 내가 지우려는 아이템 이름과 같다면
             if (slot.itemName == targetName)
             {
-                slot.ClearSlot(); // ★ 여기서 비로소 함수가 호출됩니다!
+                slot.ClearSlot(); 
                 return; // 찾아서 지웠으니 종료
             }
         }
@@ -80,7 +80,7 @@ public class InventoryManager : MonoBehaviour
 
     public void ToggleInventory()
     {
-        isInventoryOpen = !isInventoryOpen;
+        isInventoryOpen = !isInventoryOpen; //토글: 입력을 받을 때마다 상태를 반대로 바꿈
         inventoryUI.SetActive(isInventoryOpen);
 
         if (isInventoryOpen)
@@ -88,14 +88,12 @@ public class InventoryManager : MonoBehaviour
             // 인벤토리가 열리면 마우스 커서를 자유롭게 함
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            // 필요하다면 게임 시간을 멈출 수도 있습니다: Time.timeScale = 0f;
         }
         else
         {
             // 인벤토리가 닫히면 다시 화면 중앙에 가둠
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            // 게임 시간 다시 재생: Time.timeScale = 1f;
         }
     }
 }

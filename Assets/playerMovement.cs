@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("카메라")]
     public Camera playerCamera;         // 플레이어 카메라
 
-    private CharacterController controller;
+    private CharacterController controller; 
     private float xRotation = 0f;       // 카메라 상하 회전값
     private Vector3 velocity;           // 중력 속도 저장용
 
@@ -79,7 +79,7 @@ public class PlayerMovement : MonoBehaviour
 
         // 카메라 상하 회전
         xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f); //너무 많이 회전하지 않도록 시야 각도를 제한
 
         playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
     }

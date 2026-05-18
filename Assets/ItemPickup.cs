@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ItemPickup : MonoBehaviour
+public class ItemPickup : MonoBehaviour //월드에 놓인 아이템에 붙이는 스크립트
 {
     public Item itemData; // 아까 만든 ScriptableObject 연결
 
