@@ -12,15 +12,12 @@ public class DrawerInteract : MonoBehaviour
     [Header("잠금 설정")]
     public string requiredKeyName = "서랍 열쇠";
 
-    [Header("상호작용 설정")]
-    public float interactDistance = 2.5f; //바라봐야 하는 최대 거리
-
     private Vector3 closedPos;
     private Vector3 openPos;
     private bool isOpen = false;
     private bool isMoving = false;
 
-    public bool IsOpen 
+    public bool IsOpen
     {
         get
         {
